@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BoostMax — Boostez votre présence sur les réseaux sociaux</title>
+<meta name="description" content="BoostMax livre abonnés, likes et vues sur Instagram, Facebook, TikTok, YouTube et WhatsApp. Paiement MTN Mobile Money, Airtel Money et carte bancaire.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --bg:#0E0B1F;
+    --bg-soft:#140F29;
+    --card:#1B1438;
+    --card-border:rgba(255,255,255,0.09);
+    --text:#F4F2FB;
+    --text-dim:#A79FC4;
+    --violet:#7C3AED;
+    --pink:#EC4899;
+    --amber:#F59E0B;
+    --cyan:#06B6D4;
+    --whatsapp:#25D366;
+    --radius:18px;
+    --grad: linear-gradient(135deg, var(--violet), var(--pink) 45%, var(--amber) 75%, var(--cyan));
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    line-height:1.55;
+    overflow-x:hidden;
+  }
+  h1,h2,h3{font-family:'Unbounded', sans-serif; line-height:1.15; letter-spacing:-0.01em;}
+  a{color:inherit; text-decoration:none;}
+  ul,ol{list-style:none;}
+  img,svg{display:block; max-width:100%;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 24px;}
+  .grad-text{
+    background:var(--grad);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.78rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    margin-bottom:14px;
+  }
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:14px 26px;
+    border-radius:999px;
+    font-weight:600;
+    font-size:0.95rem;
+    cursor:pointer;
+    border:1px solid transparent;
+    transition:transform .25s ease, box-shadow .25s ease, opacity .25s ease;
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn--primary{
+    background:var(--grad);
+    color:#0E0B1F;
+    box-shadow:0 10px 30px -10px rgba(124,58,237,0.6);
+  }
+  .btn--whatsapp{
+    background:var(--whatsapp);
+    color:#06210F;
+    box-shadow:0 10px 30px -10px rgba(37,211,102,0.45);
+  }
+  .btn--ghost{
+    background:transparent;
+    border-color:var(--card-border);
+    color:var(--text);
+  }
+  .btn--ghost:hover{border-color:var(--violet);}
+  .btn--block{width:100%; justify-content:center;}
+
+  /* ---------- NAV ---------- */
+  .nav{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    backdrop-filter:blur(10px);
+    background:rgba(14,11,31,0.65);
+    border-bottom:1px solid transparent;
+    transition:border-color .3s ease, background .3s ease;
+  }
+  .nav.scrolled{border-color:var(--card-border); background:rgba(14,11,31,0.92);}
+  .nav__inner{
+    max-width:1180px; margin:0 auto; padding:16px 24px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .nav__logo{font-family:'Unbounded'; font-weight:700; font-size:1.2rem;}
+  .nav__logo span{
+    background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .nav__links{display:flex; align-items:center; gap:30px; font-size:0.92rem; font-weight:500;}
+  .nav__links a:not(.nav__cta){color:var(--text-dim); transition:color .2s;}
+  .nav__links a:not(.nav__cta):hover{color:var(--text);}
+  .nav__cta{
+    background:var(--grad); color:#0E0B1F; padding:9px 20px; border-radius:999px; font-weight:700;
+  }
+  .nav__burger{display:none; background:none; border:none; color:var(--text); font-size:1.5rem; cursor:pointer;}
+
+  .nav__auth{display:flex; align-items:center; gap:10px;}
+  .nav__balance{
+    font-family:'JetBrains Mono'; font-size:0.8rem; background:var(--card);
+    border:1px solid var(--card-border); padding:7px 14px; border-radius:999px; color:var(--text);
+  }
+  .nav__login-btn{
+    background:var(--grad); color:#0E0B1F; padding:9px 18px; border-radius:999px;
+    font-weight:700; font-size:0.86rem; border:none; cursor:pointer; font-family:'Inter';
+  }
+  .nav__logout-btn{
+    background:none; border:1px solid var(--card-border); color:var(--text-dim);
+    padding:7px 14px; border-radius:999px; font-size:0.8rem; cursor:pointer; font-family:'Inter';
+  }
+  @media(max-width:540px){ .nav__balance span.balance-label{display:none;} }
+
+  .auth-tabs{display:flex; gap:8px; margin-bottom:22px;}
+  .auth-tab{
+    flex:1; background:var(--bg-soft); border:1px solid var(--card-border); color:var(--text-dim);
+    padding:10px; border-radius:10px; font-weight:600; cursor:pointer; font-size:0.88rem; font-family:'Inter';
+  }
+  .auth-tab.active{background:var(--grad); color:#0E0B1F; border-color:transparent;}
+
+  .recharge-presets{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;}
+  .preset-btn{
+    background:var(--bg-soft); border:1px solid var(--card-border); color:var(--text);
+    padding:8px 14px; border-radius:999px; font-size:0.85rem; cursor:pointer; font-family:'JetBrains Mono';
+  }
+  .preset-btn.active{background:var(--grad); color:#0E0B1F; border-color:transparent;}
+
+  @media(max-width:860px){
+    .nav__links{
+      position:fixed; top:64px; right:0; left:0;
+      background:var(--bg-soft); border-bottom:1px solid var(--card-border);
+      flex-direction:column; align-items:flex-start; padding:22px 24px; gap:18px;
+      transform:translateY(-130%); opacity:0; transition:all .3s ease; pointer-events:none;
+    }
+    .nav__links.open{transform:translateY(0); opacity:1; pointer-events:auto;}
+    .nav__burger{display:block;}
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{padding:150px 0 90px;}
+  .hero__inner{
+    max-width:1180px; margin:0 auto; padding:0 24px;
+    display:grid; grid-template-columns:1.1fr 0.9fr; gap:50px; align-items:center;
+  }
+  .hero h1{font-size:clamp(2.1rem, 4.2vw, 3.4rem); margin-bottom:20px;}
+  .hero__sub{color:var(--text-dim); font-size:1.08rem; max-width:480px; margin-bottom:34px;}
+  .hero__actions{display:flex; gap:16px; flex-wrap:wrap;}
+
+  .orbit{position:relative; width:360px; height:360px; margin:0 auto;}
+  .orbit-ring{
+    position:absolute; inset:0; border-radius:50%;
+    border:1.5px dashed rgba(255,255,255,0.14);
+  }
+  .orbit-center{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:108px; height:108px; border-radius:50%;
+    background:var(--card); border:1px solid var(--card-border);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 60px -10px rgba(124,58,237,0.55);
+  }
+  .orbit-center svg{width:46px; height:46px;}
+  .orbit-spin{position:absolute; inset:0; animation:spin 26s linear infinite;}
+  .chip{
+    position:absolute; top:50%; left:50%; width:60px; height:60px; margin:-30px;
+    transform: rotate(var(--a)) translate(155px) rotate(calc(-1 * var(--a)));
+  }
+  .chip-inner{
+    width:100%; height:100%; border-radius:16px;
+    background:var(--card); border:1px solid var(--card-border);
+    display:flex; align-items:center; justify-content:center;
+    animation:counterspin 26s linear infinite;
+    box-shadow:0 8px 24px -8px rgba(0,0,0,0.5);
+  }
+  .chip-inner svg{width:26px; height:26px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @keyframes counterspin{to{transform:rotate(-360deg);}}
+
+  @media(max-width:900px){
+    .hero{padding:130px 0 60px;}
+    .hero__inner{grid-template-columns:1fr; text-align:center;}
+    .hero__sub{margin-left:auto; margin-right:auto;}
+    .hero__actions{justify-content:center;}
+    .orbit{width:280px; height:280px; margin-top:20px;}
+    .chip{transform: rotate(var(--a)) translate(118px) rotate(calc(-1 * var(--a)));}
+  }
+
+  /* ---------- PLATFORM STRIP ---------- */
+  .platforms{padding:30px 0 70px;}
+  .platforms__row{
+    display:flex; flex-wrap:wrap; gap:14px; justify-content:center;
+  }
+  .platform-pill{
+    display:flex; align-items:center; gap:10px;
+    background:var(--card); border:1px solid var(--card-border);
+    padding:10px 18px; border-radius:999px; font-weight:600; font-size:0.9rem;
+    cursor:pointer; transition:border-color .2s, transform .2s;
+  }
+  .platform-pill:hover{border-color:var(--violet); transform:translateY(-2px);}
+  .platform-pill svg{width:18px; height:18px;}
+
+  /* ---------- SECTION HEADERS ---------- */
+  .section{padding:90px 0;}
+  .section--soft{background:var(--bg-soft);}
+  .section__head{max-width:620px; margin:0 auto 50px; text-align:center;}
+  .section__head h2{font-size:clamp(1.7rem,3vw,2.3rem); margin-bottom:14px;}
+  .section__head p{color:var(--text-dim);}
+
+  /* ---------- STEPS ---------- */
+  .steps__list{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:30px;
+    max-width:1180px; margin:0 auto; padding:0 24px;
+  }
+  .steps__num{
+    font-family:'JetBrains Mono'; font-weight:700; font-size:0.85rem;
+    color:var(--cyan); display:block; margin-bottom:14px;
+  }
+  .steps__list h3{font-size:1.2rem; margin-bottom:10px;}
+  .steps__list p{color:var(--text-dim); font-size:0.95rem;}
+  @media(max-width:760px){.steps__list{grid-template-columns:1fr;}}
+
+  /* ---------- PRICING ---------- */
+  .pricing__tabs{
+    display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:44px;
+  }
+  .tab-btn{
+    background:var(--card); border:1px solid var(--card-border); color:var(--text-dim);
+    padding:10px 20px; border-radius:999px; font-weight:600; font-size:0.9rem; cursor:pointer;
+    display:flex; align-items:center; gap:8px; transition:all .2s;
+  }
+  .tab-btn svg{width:16px; height:16px;}
+  .tab-btn.active{background:var(--grad); color:#0E0B1F; border-color:transparent;}
+  .pricing__grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:26px;
+    max-width:1180px; margin:0 auto; padding:0 24px;
+  }
+  .price-card{
+    background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius);
+    padding:32px 26px; position:relative; display:flex; flex-direction:column;
+  }
+  .price-card.popular{border-color:var(--pink);}
+  .price-card .badge{
+    position:absolute; top:-13px; right:24px;
+    background:var(--grad); color:#0E0B1F; font-size:0.72rem; font-weight:700;
+    padding:5px 12px; border-radius:999px; letter-spacing:.03em;
+  }
+  .price-card h3{font-size:1.1rem; margin-bottom:6px;}
+  .price-card .qty{color:var(--text-dim); font-size:0.9rem; margin-bottom:18px;}
+  .price-card .amount{
+    font-family:'JetBrains Mono'; font-size:1.7rem; font-weight:700; margin-bottom:20px;
+  }
+  .price-card ul{margin-bottom:26px; flex:1;}
+  .price-card li{
+    font-size:0.88rem; color:var(--text-dim); padding-left:22px; position:relative; margin-bottom:10px;
+  }
+  .price-card li::before{
+    content:"✓"; position:absolute; left:0; color:var(--cyan); font-weight:700;
+  }
+  @media(max-width:860px){.pricing__grid{grid-template-columns:1fr; max-width:420px;}}
+
+  /* ---------- PAYMENT ---------- */
+  .payment__grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:24px;
+    max-width:1180px; margin:0 auto; padding:0 24px;
+  }
+  .pay-card{
+    background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius);
+    padding:28px; text-align:center;
+  }
+  .pay-card .pay-icon{
+    width:52px; height:52px; border-radius:14px; margin:0 auto 16px;
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-family:'JetBrains Mono';
+    font-size:0.95rem;
+  }
+  .pay-card h3{font-size:1.05rem; margin-bottom:8px;}
+  .pay-card p{color:var(--text-dim); font-size:0.88rem;}
+  @media(max-width:760px){.payment__grid{grid-template-columns:1fr; max-width:380px;}}
+
+  /* ---------- FEATURES ---------- */
+  .features__grid{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:22px;
+    max-width:1180px; margin:0 auto; padding:0 24px;
+  }
+  .feature{padding:8px;}
+  .feature .f-icon{
+    width:46px; height:46px; border-radius:12px; background:var(--card);
+    border:1px solid var(--card-border); display:flex; align-items:center; justify-content:center; margin-bottom:16px;
+  }
+  .feature .f-icon svg{width:22px; height:22px; color:var(--cyan);}
+  .feature h3{font-size:1rem; margin-bottom:8px;}
+  .feature p{color:var(--text-dim); font-size:0.88rem;}
+  @media(max-width:860px){.features__grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:500px){.features__grid{grid-template-columns:1fr;}}
+
+  /* ---------- FAQ ---------- */
+  .faq__list{max-width:760px; margin:0 auto; padding:0 24px;}
+  .faq-item{border-bottom:1px solid var(--card-border);}
+  .faq-q{
+    width:100%; text-align:left; background:none; border:none; color:var(--text);
+    padding:22px 0; font-size:1rem; font-weight:600; font-family:'Inter';
+    display:flex; justify-content:space-between; align-items:center; cursor:pointer;
+  }
+  .faq-q .plus{transition:transform .25s ease; color:var(--violet); font-size:1.3rem;}
+  .faq-item.open .plus{transform:rotate(45deg);}
+  .faq-a{
+    max-height:0; overflow:hidden; transition:max-height .3s ease;
+    color:var(--text-dim); font-size:0.92rem;
+  }
+  .faq-a p{padding-bottom:22px;}
+
+  /* ---------- CONTACT ---------- */
+  .contact__grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:50px;
+    max-width:1180px; margin:0 auto; padding:0 24px; align-items:start;
+  }
+  .contact__info h2{font-size:1.8rem; margin-bottom:16px;}
+  .contact__info p{color:var(--text-dim); margin-bottom:26px;}
+  .contact__direct{
+    display:flex; align-items:center; gap:14px; background:var(--card);
+    border:1px solid var(--card-border); border-radius:var(--radius); padding:18px 20px; margin-bottom:14px;
+  }
+  .contact__direct .ic{
+    width:42px; height:42px; border-radius:50%; background:var(--whatsapp);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .contact__direct .ic svg{width:20px; height:20px; color:#06210F;}
+  .contact__direct strong{display:block; font-size:0.95rem;}
+  .contact__direct span{color:var(--text-dim); font-size:0.84rem;}
+
+  form{display:flex; flex-direction:column; gap:14px;}
+  .field label{font-size:0.84rem; color:var(--text-dim); display:block; margin-bottom:6px;}
+  .field input, .field select, .field textarea{
+    width:100%; background:var(--card); border:1px solid var(--card-border); color:var(--text);
+    padding:13px 14px; border-radius:10px; font-family:'Inter'; font-size:0.92rem;
+  }
+  .field textarea{resize:vertical; min-height:90px;}
+  .field input:focus, .field select:focus, .field textarea:focus{outline:2px solid var(--violet); outline-offset:1px;}
+  @media(max-width:860px){.contact__grid{grid-template-columns:1fr;}}
+
+  /* ---------- FOOTER ---------- */
+  .footer{padding:50px 0 30px; border-top:1px solid var(--card-border);}
+  .footer__inner{
+    max-width:1180px; margin:0 auto; padding:0 24px;
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px;
+  }
+  .footer__logo{font-family:'Unbounded'; font-weight:700;}
+  .footer__logo span{background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .footer small{color:var(--text-dim); font-size:0.82rem; display:block; margin-top:6px;}
+  .footer__links{display:flex; gap:22px; font-size:0.88rem; color:var(--text-dim);}
+
+  /* ---------- WHATSAPP FLOAT ---------- */
+  .wa-float{
+    position:fixed; bottom:24px; right:24px; z-index:90;
+    width:58px; height:58px; border-radius:50%; background:var(--whatsapp);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 10px 30px -8px rgba(37,211,102,0.6);
+    animation:pulse 2.6s ease-in-out infinite;
+  }
+  .wa-float svg{width:28px; height:28px; color:#06210F;}
+  @keyframes pulse{
+    0%,100%{box-shadow:0 0 0 0 rgba(37,211,102,0.5);}
+    50%{box-shadow:0 0 0 14px rgba(37,211,102,0);}
+  }
+
+  /* ---------- ORDER MODAL ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; z-index:200; background:rgba(8,6,18,0.72);
+    backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity .25s ease; padding:20px;
+  }
+  .modal-overlay.open{opacity:1; pointer-events:auto;}
+  .modal{
+    background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius);
+    padding:32px; max-width:420px; width:100%; position:relative;
+  }
+  .modal-close{
+    position:absolute; top:14px; right:16px; background:none; border:none;
+    color:var(--text-dim); font-size:1.5rem; cursor:pointer; line-height:1;
+  }
+  .modal h3{font-size:1.2rem; margin-bottom:6px;}
+  .modal-sub{color:var(--text-dim); font-size:0.88rem; margin-bottom:20px;}
+  .modal-total{
+    display:flex; justify-content:space-between; align-items:center;
+    margin:18px 0; font-family:'JetBrains Mono'; font-size:1.15rem;
+  }
+  .modal-note{font-size:0.78rem; color:var(--text-dim); margin-top:10px; line-height:1.5;}
+  .modal-status{margin-top:14px; font-size:0.85rem; color:var(--text-dim); min-height:18px;}
+
+  /* reveal animation */
+  .reveal{opacity:0; transform:translateY(24px); transition:opacity .6s ease, transform .6s ease;}
+  .reveal.visible{opacity:1; transform:translateY(0);}
+
+  @media(prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<header class="nav" id="nav">
+  <div class="nav__inner">
+    <a href="#top" class="nav__logo">Boost<span>Max</span></a>
+    <nav class="nav__links" id="navLinks">
+      <a href="#services">Services</a>
+      <a href="#tarifs">Tarifs</a>
+      <a href="#comment">Comment ça marche</a>
+      <a href="#paiement">Paiement</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contact" class="nav__cta">Commander</a>
+    </nav>
+    <div class="nav__auth" id="navAuth"></div>
+    <button class="nav__burger" id="burger" aria-label="Ouvrir le menu">☰</button>
+  </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="top">
+  <div class="hero__inner">
+    <div class="hero__copy reveal">
+      <p class="eyebrow">Instagram · Facebook · TikTok · YouTube · Telegram · Spotify · Apple Music · WhatsApp</p>
+      <h1>Donnez à vos comptes <span class="grad-text">l'élan</span> qu'ils méritent.</h1>
+      <p class="hero__sub">BoostMax livre abonnés, likes et vues sur les réseaux qui comptent pour vous. Commande simple, paiement Mobile Money, livraison progressive.</p>
+      <div class="hero__actions">
+        <a href="#tarifs" class="btn btn--primary">Voir les tarifs</a>
+        <a href="#" class="btn btn--whatsapp" data-wa data-wa-text="Bonjour BoostMax, je voudrais des infos sur vos forfaits.">
+          <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.5A10 10 0 1 0 12 2Z" stroke="currentColor" stroke-width="1.6"/><path d="M8.5 8.8c.2-1 1.7-1.1 2-.3l.6 1.5c.2.4 0 .8-.3 1.1l-.5.5c.5 1 1.4 2 2.4 2.4l.5-.5c.3-.3.7-.4 1.1-.3l1.5.6c.8.3.7 1.8-.3 2-2.7.6-6.4-3.1-7-5.8Z" fill="currentColor"/></svg>
+          WhatsApp
+        </a>
+      </div>
+    </div>
+    <div class="hero__visual reveal">
+      <div class="orbit">
+        <div class="orbit-ring"></div>
+        <div class="orbit-center">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 19 9 9l4 6 7-12" stroke="url(#g1)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="g1" x1="0" y1="0" x2="24" y2="24"><stop stop-color="#7C3AED"/><stop offset="0.5" stop-color="#EC4899"/><stop offset="1" stop-color="#F59E0B"/></linearGradient></defs></svg>
+        </div>
+        <div class="orbit-spin" id="orbitSpin"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PLATFORM STRIP ===== -->
+<section class="platforms">
+  <div class="wrap platforms__row" id="platformStrip"></div>
+</section>
+
+<!-- ===== COMMENT ÇA MARCHE ===== -->
+<section class="section section--soft" id="comment">
+  <div class="section__head reveal">
+    <h2>Comment ça marche</h2>
+    <p>Trois étapes, aucune compétence technique requise.</p>
+  </div>
+  <ol class="steps__list reveal">
+    <li>
+      <span class="steps__num">01</span>
+      <h3>Choisissez votre forfait</h3>
+      <p>Sélectionnez la plateforme et le volume d'abonnés, likes ou vues qui correspond à votre objectif.</p>
+    </li>
+    <li>
+      <span class="steps__num">02</span>
+      <h3>Payez via Mobile Money</h3>
+      <p>Réglez par MTN Mobile Money, Airtel Money ou carte bancaire. Aucun mot de passe de compte n'est jamais demandé.</p>
+    </li>
+    <li>
+      <span class="steps__num">03</span>
+      <h3>Recevez votre boost</h3>
+      <p>La livraison démarre sous 24h et se déroule de façon progressive pour rester naturelle.</p>
+    </li>
+  </ol>
+</section>
+
+<!-- ===== SERVICES / TARIFS ===== -->
+<section class="section" id="services">
+  <div class="section__head reveal">
+    <h2>Nos forfaits</h2>
+    <p>Choisissez une plateforme pour afficher les forfaits disponibles.</p>
+  </div>
+  <div id="tarifs"></div>
+  <div class="pricing__tabs" id="platformTabs"></div>
+  <div class="pricing__grid reveal" id="pricingGrid"></div>
+</section>
+
+<!-- ===== PAIEMENT ===== -->
+<section class="section section--soft" id="paiement">
+  <div class="section__head reveal">
+    <h2>Paiement simple et local</h2>
+    <p>Trois façons de régler votre commande, sans complication.</p>
+  </div>
+  <div class="payment__grid reveal">
+    <div class="pay-card">
+      <div class="pay-icon" style="background:#FFCC0820; color:#FFCC08;">MTN</div>
+      <h3>MTN Mobile Money</h3>
+      <p>Envoyez le montant au numéro communiqué après votre commande, puis confirmez par WhatsApp.</p>
+    </div>
+    <div class="pay-card">
+      <div class="pay-icon" style="background:#ED1C2420; color:#ED1C24;">Airtel</div>
+      <h3>Airtel Money</h3>
+      <p>Même principe : transfert rapide vers le numéro Airtel Money fourni, confirmation immédiate.</p>
+    </div>
+    <div class="pay-card">
+      <div class="pay-icon" style="background:#06B6D420; color:#06B6D4;">💳</div>
+      <h3>Carte bancaire</h3>
+      <p>Paiement en ligne sécurisé via lien de paiement, envoyé sur demande pour les commandes plus importantes.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== POURQUOI BOOSTMAX ===== -->
+<section class="section">
+  <div class="section__head reveal">
+    <h2>Pourquoi BoostMax</h2>
+  </div>
+  <div class="features__grid reveal">
+    <div class="feature">
+      <div class="f-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+      <h3>Livraison rapide</h3>
+      <p>Le boost démarre sous 24h, avec un rythme de livraison pensé pour rester progressif.</p>
+    </div>
+    <div class="feature">
+      <div class="f-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3 4 6v6c0 5 3.5 7.7 8 9 4.5-1.3 8-4 8-9V6l-8-3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+      <h3>Aucun mot de passe</h3>
+      <p>Seul votre nom d'utilisateur public est nécessaire. Vos identifiants restent privés.</p>
+    </div>
+    <div class="feature">
+      <div class="f-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.6"/><path d="M5 20c1.2-3.6 4-5.4 7-5.4S17.8 16.4 19 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+      <h3>Profils actifs</h3>
+      <p>Des sources sélectionnées pour des résultats qui complètent votre croissance organique.</p>
+    </div>
+    <div class="feature">
+      <div class="f-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 4h16v12H7l-3 4V4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+      <h3>Support WhatsApp</h3>
+      <p>Une question, un suivi de commande ? Réponse directe sur WhatsApp.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section class="section section--soft" id="faq">
+  <div class="section__head reveal">
+    <h2>Questions fréquentes</h2>
+  </div>
+  <div class="faq__list reveal" id="faqList">
+    <div class="faq-item">
+      <button class="faq-q">Combien de temps prend la livraison ?<span class="plus">+</span></button>
+      <div class="faq-a"><p>La livraison démarre généralement sous 24h après confirmation du paiement, puis se déroule de façon progressive sur quelques jours selon le forfait choisi.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Quels moyens de paiement acceptez-vous ?<span class="plus">+</span></button>
+      <div class="faq-a"><p>MTN Mobile Money, Airtel Money et carte bancaire (sur demande pour les commandes importantes).</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Ai-je besoin de donner mon mot de passe ?<span class="plus">+</span></button>
+      <div class="faq-a"><p>Non, jamais. Seul votre nom d'utilisateur public (ou le lien de votre profil/vidéo) est nécessaire pour traiter la commande.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Que faire si je ne reçois pas ma commande ?<span class="plus">+</span></button>
+      <div class="faq-a"><p>Contactez le support via WhatsApp avec votre numéro de commande : nous vérifions et relançons la livraison ou procédons à un remboursement si nécessaire.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Puis-je commander pour plusieurs plateformes à la fois ?<span class="plus">+</span></button>
+      <div class="faq-a"><p>Oui. Indiquez les plateformes et forfaits souhaités dans le formulaire ou directement sur WhatsApp, et nous préparons un récapitulatif unique.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CONTACT ===== -->
+<section class="section" id="contact">
+  <div class="contact__grid">
+    <div class="contact__info reveal">
+      <h2>Passer commande</h2>
+      <p>Remplissez le formulaire ou écrivez directement sur WhatsApp — réponse rapide.</p>
+      <a class="contact__direct" href="#" data-wa data-wa-text="Bonjour BoostMax, je voudrais passer une commande.">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.5A10 10 0 1 0 12 2Z" stroke="currentColor" stroke-width="1.6"/></svg></span>
+        <span><strong>WhatsApp</strong><span>Réponse en quelques minutes</span></span>
+      </a>
+      <a class="contact__direct" href="mailto:glorydesignlab2@gmail.com">
+        <span class="ic" style="background:var(--violet)"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="3" stroke="#0E0B1F" stroke-width="1.6"/><path d="m4 7 8 6 8-6" stroke="#0E0B1F" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span><strong>Email</strong><span>glorydesignlab2@gmail.com</span></span>
+      </a>
+    </div>
+    <form id="orderForm" class="reveal">
+      <!-- Web3Forms : remplacez YOUR_ACCESS_KEY_HERE par votre clé (voir web3forms.com) -->
+      <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
+      <input type="hidden" name="subject" value="Nouvelle commande BoostMax">
+      <div class="field">
+        <label>Nom complet</label>
+        <input type="text" name="name" required>
+      </div>
+      <div class="field">
+        <label>Téléphone / WhatsApp</label>
+        <input type="tel" name="phone" required>
+      </div>
+      <div class="field">
+        <label>Plateforme</label>
+        <select name="platform">
+          <option>Instagram</option>
+          <option>Facebook</option>
+          <option>TikTok</option>
+          <option>YouTube</option>
+          <option>Telegram</option>
+          <option>Spotify</option>
+          <option>Apple Music</option>
+          <option>WhatsApp</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Forfait souhaité / nom d'utilisateur</label>
+        <textarea name="message" placeholder="Ex : Forfait Pro Instagram — @monpseudo"></textarea>
+      </div>
+      <button type="submit" class="btn btn--primary btn--block">Envoyer ma demande</button>
+    </form>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="footer__inner">
+    <div>
+      <div class="footer__logo">Boost<span>Max</span></div>
+      <small>© 2026 BoostMax. Tous droits réservés.</small>
+    </div>
+    <div class="footer__links">
+      <a href="#services">Services</a>
+      <a href="#tarifs">Tarifs</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ===== AUTH MODAL ===== -->
+<div class="modal-overlay" id="authOverlay">
+  <div class="modal">
+    <button class="modal-close" id="authClose" aria-label="Fermer">×</button>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin">Connexion</button>
+      <button class="auth-tab" id="tabSignup">Inscription</button>
+    </div>
+
+    <div id="loginForm">
+      <div class="field"><label>Email</label><input type="email" id="loginEmail"></div>
+      <div class="field"><label>Mot de passe</label><input type="password" id="loginPassword"></div>
+      <button class="btn btn--primary btn--block" id="loginBtn" style="margin-top:6px">Se connecter</button>
+    </div>
+
+    <div id="signupForm" style="display:none">
+      <div class="field"><label>Nom complet</label><input type="text" id="signupName"></div>
+      <div class="field"><label>Téléphone</label><input type="tel" id="signupPhone"></div>
+      <div class="field"><label>Email</label><input type="email" id="signupEmail"></div>
+      <div class="field"><label>Mot de passe (6 caractères min.)</label><input type="password" id="signupPassword"></div>
+      <button class="btn btn--primary btn--block" id="signupBtn" style="margin-top:6px">Créer mon compte</button>
+    </div>
+
+    <p class="modal-status" id="authStatus"></p>
+  </div>
+</div>
+
+<!-- ===== ORDER MODAL ===== -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <button class="modal-close" id="modalClose" aria-label="Fermer">×</button>
+    <h3 id="modalTitle">Commander</h3>
+    <p class="modal-sub" id="modalSub"></p>
+    <div class="field">
+      <label>Quantité (<span id="modalUnitLabel"></span>)</label>
+      <input type="number" id="modalQty">
+    </div>
+    <div class="field">
+      <label>Lien du profil / vidéo ou nom d'utilisateur</label>
+      <input type="text" id="modalLink" placeholder="@votre_pseudo ou lien complet">
+    </div>
+    <div class="modal-total">
+      <span>Total</span>
+      <strong id="modalPrice"></strong>
+    </div>
+    <button class="btn btn--primary btn--block" id="modalPayBtn">Commander</button>
+    <p class="modal-status" id="modalStatus"></p>
+    <p class="modal-note">Le montant est débité automatiquement de votre solde BoostMax.</p>
+  </div>
+</div>
+
+<!-- ===== RECHARGE MODAL ===== -->
+<div class="modal-overlay" id="rechargeOverlay">
+  <div class="modal">
+    <button class="modal-close" id="rechargeClose" aria-label="Fermer">×</button>
+    <h3>Recharger mon solde</h3>
+    <p class="modal-sub">Choisissez un montant ou saisissez le vôtre.</p>
+    <div class="recharge-presets" id="rechargePresets"></div>
+    <div class="field">
+      <label>Montant (FCFA)</label>
+      <input type="number" id="rechargeAmount" min="500" step="500">
+    </div>
+    <button class="btn btn--primary btn--block" id="rechargePayBtn">Payer</button>
+    <p class="modal-status" id="rechargeStatus"></p>
+    <p class="modal-note">Paiement traité par notre passerelle sécurisée (MTN MoMo, Airtel Money, carte).</p>
+  </div>
+</div>
+
+<!-- WhatsApp float button -->
+<a href="#" class="wa-float" data-wa data-wa-text="Bonjour BoostMax !" aria-label="Discuter sur WhatsApp">
+  <svg viewBox="0 0 24 24" fill="none"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.5A10 10 0 1 0 12 2Z" stroke="currentColor" stroke-width="1.6"/><path d="M8.5 8.8c.2-1 1.7-1.1 2-.3l.6 1.5c.2.4 0 .8-.3 1.1l-.5.5c.5 1 1.4 2 2.4 2.4l.5-.5c.3-.3.7-.4 1.1-.3l1.5.6c.8.3.7 1.8-.3 2-2.7.6-6.4-3.1-7-5.8Z" fill="currentColor"/></svg>
+</a>
+
+<script>
+/* ====== CONFIG : à personnaliser ====== */
+const WHATSAPP_NUMBER = "242061502199"; // +242 06 150 2199
+
+const SUPABASE_URL = "https://hnpmrcdeyrgsszbivltj.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_WDMKzfgE_jlVZvm3udeMbQ_TDzE0HDj";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* ====== ICONS (génériques, non liées à une marque) ====== */
+const ICONS = {
+  instagram: '<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="6" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor"/></svg>',
+  facebook: '<svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="9" r="3" stroke="currentColor" stroke-width="1.6"/><circle cx="16" cy="10" r="2.4" stroke="currentColor" stroke-width="1.6"/><path d="M3 19c1-3.4 3.4-5 6-5s5 1.6 6 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+  tiktok: '<svg viewBox="0 0 24 24" fill="none"><path d="M9 9.5a4.5 4.5 0 1 0 3.2 4.3V3.5h3a4 4 0 0 0 3.3 3.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  youtube: '<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="12" rx="4" stroke="currentColor" stroke-width="1.6"/><path d="M11 10.5 14.5 12 11 13.5v-3Z" fill="currentColor"/></svg>',
+  whatsapp: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.5A10 10 0 1 0 12 2Z" stroke="currentColor" stroke-width="1.6"/><path d="M8.5 8.8c.2-1 1.7-1.1 2-.3l.6 1.5c.2.4 0 .8-.3 1.1l-.5.5c.5 1 1.4 2 2.4 2.4l.5-.5c.3-.3.7-.4 1.1-.3l1.5.6c.8.3.7 1.8-.3 2-2.7.6-6.4-3.1-7-5.8Z" fill="currentColor"/></svg>'
+};
+
+/* ====== SERVICES — tarifs par plateforme et par type de service ====== */
+/* rate = prix en FCFA pour "per" unités. Le prix d'une commande = quantité × (rate / per). */
+/* serviceId = identifiant du service chez votre fournisseur SMM (panel API). */
+/* Remplacez "ID_A_REMPLACER" par le vrai ID une fois votre compte fournisseur créé. */
+const PACKAGES = {
+  instagram: { label:"Instagram", color:"#EC4899", services:[
+    { key:"abonnes", name:"Abonnés", unit:"abonnés", rate:1500, per:1000, min:10, max:1000000, serviceId:"26421", provider:"shaker", desc:"Développez votre profil Instagram. Livraison rapide, garantie 365 jours." },
+    { key:"like", name:"Like", unit:"likes", rate:500, per:1000, min:100, max:10000000, serviceId:"26415", provider:"shaker", desc:"Plus de likes sur vos publications. Vitesse 10 000+/jour." },
+    { key:"vue", name:"Vue", unit:"vues", rate:500, per:10000, min:100, max:2000000000, serviceId:"26413", provider:"shaker", desc:"Plus de vues sur vos Reels et vidéos. Ultra rapide." },
+  ]},
+  facebook: { label:"Facebook", color:"#1877F2", services:[
+    { key:"abonnes", name:"Abonnés", unit:"abonnés", rate:1500, per:1000, min:500, max:1000000, serviceId:"26424", provider:"shaker", desc:"Développez votre page Facebook. Qualité réelle, recharge 30 jours." },
+    { key:"like", name:"Like", unit:"likes", rate:500, per:1000, min:10, max:1000000, serviceId:"26425", provider:"shaker", desc:"Plus de likes sur votre page et publications Facebook." },
+    { key:"membres", name:"Membres Groupe", unit:"membres", rate:1000, per:1000, min:10, max:1000000, serviceId:"23884", provider:"shaker", desc:"Développez votre groupe Facebook. Démarrage 0-3h, recharge 30 jours." },
+  ]},
+  tiktok: { label:"TikTok", color:"#7C3AED", services:[
+    { key:"abonnes", name:"Abonnés", unit:"abonnés", rate:1500, per:1000, min:10, max:100000, serviceId:"18847", provider:"smm", desc:"Développez votre audience TikTok. Comptes 100% réels." },
+    { key:"like", name:"Like", unit:"likes", rate:500, per:1000, min:50, max:20000, serviceId:"20979", provider:"shaker", desc:"Likes réels Non Drop, garantie à vie. Démarrage 0-2h." },
+    { key:"vue", name:"Vue", unit:"vues", rate:500, per:10000, min:100, max:2000000000, serviceId:"26406", provider:"shaker", desc:"Vues ultra rapides sur vos vidéos TikTok. Démarrage instantané." },
+    { key:"partage", name:"Partage", unit:"partages", rate:500, per:10000, min:100, max:2000000000, serviceId:"18622", provider:"shaker", desc:"Plus de partages sur vos vidéos TikTok. Instantané." },
+    { key:"sauvegarde", name:"Sauvegarde", unit:"sauvegardes", rate:500, per:10000, min:100, max:2000000000, serviceId:"22289", provider:"shaker", desc:"Plus de sauvegardes sur vos vidéos. Recharge 30 jours." },
+  ]},
+  youtube: { label:"YouTube", color:"#FF0000", services:[
+    { key:"abonnes", name:"Abonnés", unit:"abonnés", rate:2000, per:1000, min:50, max:20000, serviceId:"17989", provider:"smm", desc:"Développez votre chaîne YouTube. Qualité 100% authentique." },
+    { key:"like", name:"Like", unit:"likes", rate:500, per:1000, min:100, max:100000, serviceId:"18466", provider:"smm", desc:"Plus de likes sur vos vidéos YouTube." },
+    { key:"vue", name:"Vue", unit:"vues", rate:500, per:1000, min:100, max:1000000, serviceId:"17988", provider:"smm", desc:"Plus de vues sur vos vidéos. Livraison progressive." },
+  ]},
+  telegram: { label:"Telegram", color:"#2AABEE", services:[
+    { key:"membres", name:"Membres", unit:"membres", rate:2500, per:1000, min:100, max:100000, serviceId:"26314", provider:"shaker", desc:"Membres Haute Qualité pour votre canal ou groupe. Recharge 30 jours." },
+    { key:"membres_nd", name:"Membres Non Drop", unit:"membres", rate:4000, per:1000, min:500, max:100000, serviceId:"21416", provider:"shaker", desc:"Membres Non Drop, profils HQ. Démarrage 0-2h, recharge 30 jours." },
+  ]},
+  spotify: { label:"Spotify", color:"#1DB954", services:[
+    { key:"streams", name:"Streams", unit:"streams", rate:500, per:1000, min:500, max:100000000, serviceId:"19369", provider:"shaker", desc:"Plus d'écoutes sur vos morceaux. 100k/jour, démarrage 0-1h." },
+    { key:"abonnes", name:"Abonnés", unit:"abonnés", rate:1000, per:1000, min:100, max:1000000, serviceId:"23979", provider:"shaker", desc:"Plus d'abonnés sur votre profil Spotify. Recharge 30 jours." },
+  ]},
+  applemusic: { label:"Apple Music", color:"#FC3C44", services:[
+    { key:"streams", name:"Streams", unit:"streams", rate:2000, per:1000, min:1000, max:1000000, serviceId:"6474", provider:"shaker", desc:"Plus d'écoutes sur Apple Music. Tous épisodes, mondial." },
+    { key:"abonnes", name:"Abonnés Podcast", unit:"abonnés", rate:5000, per:1000, min:500, max:100000, serviceId:"6470", provider:"shaker", desc:"Plus d'abonnés sur votre Podcast Apple. Qualité réelle, mondial." },
+  ]},
+  whatsapp: { label:"WhatsApp", color:"#25D366", services:[
+    { key:"membres", name:"Membres Canal", unit:"membres", rate:2000, per:1000, min:10, max:1000, serviceId:"24058", provider:"shaker", desc:"Membres réels pour votre canal WhatsApp. Qualité réelle." },
+    { key:"membres_nd", name:"Membres Canal Non Drop", unit:"membres", rate:3500, per:1000, min:10, max:1000, serviceId:"24060", provider:"shaker", desc:"Membres Non Drop pour votre canal WhatsApp. Démarrage instantané." },
+    { key:"reaction", name:"Réaction Emoji", unit:"réactions", rate:500, per:1000, min:10, max:50000, serviceId:"18839", provider:"shaker", desc:"Réactions Emoji sur vos publications canal WhatsApp. Instantané." },
+    { key:"bot_6mois", name:"Bot Status Viewer 6 mois", unit:"compte", rate:12000, per:1, min:1, max:1, serviceId:"17789", provider:"shaker", desc:"Bot WhatsApp qui voit automatiquement les statuts, reste en ligne 24/7. Valable 6 mois." },
+    { key:"bot_1an", name:"Bot Status Viewer 1 an", unit:"compte", rate:18000, per:1, min:1, max:1, serviceId:"7692", provider:"shaker", desc:"Bot WhatsApp qui voit automatiquement les statuts, reste en ligne 24/7. Valable 1 an." },
+    { key:"bot_vie", name:"Bot Status Viewer À vie", unit:"compte", rate:42000, per:1, min:1, max:1, serviceId:"7772", provider:"shaker", desc:"Bot WhatsApp qui voit automatiquement les statuts, reste en ligne 24/7. Valable à vie." },
+  ]},
+};
+
+const ORBIT_ORDER = ["instagram","facebook","tiktok","youtube","telegram","spotify","applemusic","whatsapp"];
+
+/* ---------- WhatsApp links ---------- */
+function buildWaLink(text){
+  return "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(text);
+}
+document.querySelectorAll("[data-wa]").forEach(el=>{
+  el.href = buildWaLink(el.getAttribute("data-wa-text") || "Bonjour BoostMax !");
+  el.target = "_blank";
+  el.rel = "noopener";
+});
+
+/* ---------- Orbit chips ---------- */
+const orbitSpin = document.getElementById("orbitSpin");
+ORBIT_ORDER.forEach((key,i)=>{
+  const angle = (360 / ORBIT_ORDER.length) * i;
+  const chip = document.createElement("div");
+  chip.className = "chip";
+  chip.style.setProperty("--a", angle + "deg");
+  chip.innerHTML = `<div class="chip-inner" style="color:${PACKAGES[key].color}">${ICONS[key]}</div>`;
+  orbitSpin.appendChild(chip);
+});
+
+/* ---------- Platform strip ---------- */
+const stripEl = document.getElementById("platformStrip");
+ORBIT_ORDER.forEach(key=>{
+  const pill = document.createElement("button");
+  pill.className = "platform-pill";
+  pill.style.color = PACKAGES[key].color;
+  pill.innerHTML = `${ICONS[key]}<span style="color:var(--text)">${PACKAGES[key].label}</span>`;
+  pill.addEventListener("click", ()=>{ selectPlatform(key); document.getElementById("services").scrollIntoView({behavior:"smooth"}); });
+  stripEl.appendChild(pill);
+});
+
+/* ---------- Pricing tabs + grid ---------- */
+const tabsEl = document.getElementById("platformTabs");
+const gridEl = document.getElementById("pricingGrid");
+
+function renderTabs(activeKey){
+  tabsEl.innerHTML = "";
+  ORBIT_ORDER.forEach(key=>{
+    const btn = document.createElement("button");
+    btn.className = "tab-btn" + (key === activeKey ? " active" : "");
+    btn.innerHTML = `${ICONS[key]}<span>${PACKAGES[key].label}</span>`;
+    btn.addEventListener("click", ()=> selectPlatform(key));
+    tabsEl.appendChild(btn);
+  });
+}
+
+function renderGrid(key){
+  const data = PACKAGES[key];
+  gridEl.innerHTML = "";
+  data.services.forEach((svc, idx)=>{
+    const card = document.createElement("div");
+    card.className = "price-card";
+    card.innerHTML = `
+      <h3>${svc.name}</h3>
+      <div class="qty">${svc.desc}</div>
+      <div class="amount">${svc.rate.toLocaleString("fr-FR")} FCFA <span style="font-size:0.55em; font-weight:500; color:var(--text-dim);">/ ${svc.per.toLocaleString("fr-FR")} ${svc.unit}</span></div>
+      <ul>
+        <li>Minimum ${svc.min.toLocaleString("fr-FR")} ${svc.unit}</li>
+        <li>Quantité personnalisable</li>
+        <li>Livraison progressive et sécurisée</li>
+      </ul>
+      <button class="btn btn--primary btn--block" data-order data-platform="${key}" data-service="${idx}">Commander</button>
+    `;
+    gridEl.appendChild(card);
+  });
+  gridEl.querySelectorAll("[data-order]").forEach(btn=>{
+    btn.addEventListener("click", ()=> openOrderModal(btn.dataset.platform, Number(btn.dataset.service)));
+  });
+}
+
+function selectPlatform(key){
+  renderTabs(key);
+  renderGrid(key);
+}
+selectPlatform("facebook");
+
+/* ---------- Order modal : quantité, prix dynamique, débit du solde ---------- */
+let currentOrder = null;
+let modalBalance = 0;
+const modalOverlay = document.getElementById("modalOverlay");
+const modalStatus = document.getElementById("modalStatus");
+const modalPayBtn = document.getElementById("modalPayBtn");
+const modalQtyInput = document.getElementById("modalQty");
+
+function calcPrice(order, qty){
+  return Math.max(0, Math.round(qty * (order.rate / order.per)));
+}
+
+async function openOrderModal(platformKey, serviceIndex){
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if(!session){
+    openAuthModal();
+    authStatus.textContent = "Connectez-vous d'abord pour commander.";
+    return;
+  }
+
+  const svc = PACKAGES[platformKey].services[serviceIndex];
+  currentOrder = {
+    platform: platformKey, serviceKey: svc.key, name: svc.name, unit: svc.unit,
+    rate: svc.rate, per: svc.per, min: svc.min, max: svc.max, serviceId: svc.serviceId
+  };
+
+  document.getElementById("modalTitle").textContent = `${svc.name} — ${PACKAGES[platformKey].label}`;
+  document.getElementById("modalSub").textContent = svc.desc;
+  document.getElementById("modalUnitLabel").textContent = svc.unit;
+  modalQtyInput.min = svc.min;
+  modalQtyInput.max = svc.max;
+  modalQtyInput.step = svc.min;
+  modalQtyInput.value = svc.per;
+  modalQtyInput.oninput = refreshModalPricing;
+  document.getElementById("modalLink").value = "";
+  modalStatus.textContent = "";
+
+  const { data: wallet } = await supabaseClient.from("wallets").select("balance").eq("user_id", session.user.id).single();
+  modalBalance = wallet ? wallet.balance : 0;
+
+  refreshModalPricing();
+  modalOverlay.classList.add("open");
+}
+
+function refreshModalPricing(){
+  let qty = Number(modalQtyInput.value) || 0;
+  if(qty < currentOrder.min) qty = currentOrder.min;
+  if(qty > currentOrder.max) qty = currentOrder.max;
+  const price = calcPrice(currentOrder, qty);
+  currentOrder.qty = qty;
+  currentOrder.priceValue = price;
+  document.getElementById("modalPrice").textContent = price.toLocaleString("fr-FR") + " FCFA";
+
+  if(modalBalance >= price){
+    modalPayBtn.textContent = "Confirmer la commande";
+    modalPayBtn.onclick = handleConfirmOrder;
+  } else {
+    modalPayBtn.textContent = `Solde insuffisant (${modalBalance.toLocaleString("fr-FR")} FCFA) — Recharger`;
+    modalPayBtn.onclick = ()=>{ closeOrderModal(); openRechargeModal(price - modalBalance); };
+  }
+}
+
+function closeOrderModal(){ modalOverlay.classList.remove("open"); }
+document.getElementById("modalClose").addEventListener("click", closeOrderModal);
+modalOverlay.addEventListener("click", (e)=>{ if(e.target === modalOverlay) closeOrderModal(); });
+
+async function handleConfirmOrder(){
+  const link = document.getElementById("modalLink").value.trim();
+  if(!link){ modalStatus.textContent = "Indiquez votre lien ou nom d'utilisateur."; return; }
+  modalStatus.textContent = "Commande en cours...";
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if(!session){ modalStatus.textContent = "Session expirée, reconnectez-vous."; return; }
+  try{
+    const res = await fetch("/.netlify/functions/place-order", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json", "Authorization":"Bearer " + session.access_token },
+      body: JSON.stringify({
+        platform: currentOrder.platform,
+        serviceKey: currentOrder.serviceKey,
+        serviceId: currentOrder.serviceId,
+        quantity: currentOrder.qty,
+        link
+      })
+    });
+    const data = await res.json();
+    if(data.success){
+      modalStatus.textContent = "✓ Commande envoyée ! Référence : " + data.orderId;
+      renderAuthArea(session);
+    } else {
+      modalStatus.textContent = "Erreur : " + (data.error || "réessayez ou contactez le support.");
+    }
+  }catch(err){
+    modalStatus.textContent = "Erreur réseau — réessayez.";
+  }
+}
+
+/* ---------- Recharge modal : crédit du solde ---------- */
+const rechargeOverlay = document.getElementById("rechargeOverlay");
+const rechargeStatus = document.getElementById("rechargeStatus");
+const rechargeAmountInput = document.getElementById("rechargeAmount");
+const RECHARGE_PRESETS = [5000, 10000, 25000, 50000];
+
+function renderPresets(){
+  const wrap = document.getElementById("rechargePresets");
+  wrap.innerHTML = "";
+  RECHARGE_PRESETS.forEach(amt=>{
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "preset-btn";
+    btn.textContent = amt.toLocaleString("fr-FR") + " FCFA";
+    btn.addEventListener("click", ()=> rechargeAmountInput.value = amt);
+    wrap.appendChild(btn);
+  });
+}
+
+function openRechargeModal(prefillAmount){
+  rechargeStatus.textContent = "";
+  rechargeAmountInput.value = Math.max(500, Math.round(prefillAmount || 5000));
+  renderPresets();
+  rechargeOverlay.classList.add("open");
+}
+function closeRechargeModal(){ rechargeOverlay.classList.remove("open"); }
+document.getElementById("rechargeClose").addEventListener("click", closeRechargeModal);
+rechargeOverlay.addEventListener("click", (e)=>{ if(e.target === rechargeOverlay) closeRechargeModal(); });
+
+/*
+  ÉTAPE PAIEMENT — à remplacer par le SDK réel de votre passerelle
+  (ex. CinetPay ou Flutterwave pour Mobile Money automatique, Stripe pour carte).
+  La passerelle doit confirmer le paiement et renvoyer une référence de
+  transaction avant qu'on crédite le solde.
+
+  Exemple avec CinetPay (à adapter avec vos identifiants réels) :
+    CinetPay.setConfig({ apikey: "VOTRE_CLE", site_id: "VOTRE_SITE_ID" });
+    CinetPay.getCheckout({ amount, currency: "XAF", description, ... });
+    CinetPay.waitResponse(data => {
+      if (data.status === "ACCEPTED") onSuccess(data.transaction_id);
+    });
+*/
+function openCheckout(onSuccess){
+  rechargeStatus.textContent = "⚠️ Aucune passerelle de paiement connectée pour le moment — voir le commentaire dans le code (openCheckout).";
+  // Une fois votre passerelle branchée, supprimez la ligne ci-dessus
+  // et appelez onSuccess(transactionRef) dans son callback de succès.
+}
+
+document.getElementById("rechargePayBtn").addEventListener("click", ()=>{
+  const amount = Number(rechargeAmountInput.value);
+  if(!amount || amount < 500){ rechargeStatus.textContent = "Montant minimum : 500 FCFA."; return; }
+  rechargeStatus.textContent = "Ouverture du paiement...";
+  openCheckout((transactionRef)=> confirmDeposit(amount, transactionRef));
+});
+
+async function confirmDeposit(amount, transactionRef){
+  rechargeStatus.textContent = "Confirmation du paiement...";
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if(!session){ rechargeStatus.textContent = "Session expirée, reconnectez-vous."; return; }
+  try{
+    const res = await fetch("/.netlify/functions/confirm-deposit", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json", "Authorization":"Bearer " + session.access_token },
+      body: JSON.stringify({ amount, transactionRef })
+    });
+    const data = await res.json();
+    if(data.success){
+      rechargeStatus.textContent = "✓ Solde rechargé !";
+      renderAuthArea(session);
+      setTimeout(closeRechargeModal, 1200);
+    } else {
+      rechargeStatus.textContent = "Erreur : " + (data.error || "réessayez.");
+    }
+  }catch(err){
+    rechargeStatus.textContent = "Erreur réseau — réessayez.";
+  }
+}
+
+/* ---------- Auth : connexion / inscription / solde ---------- */
+const authOverlay = document.getElementById("authOverlay");
+const authStatus = document.getElementById("authStatus");
+const navAuth = document.getElementById("navAuth");
+
+function openAuthModal(){ authStatus.textContent = ""; authOverlay.classList.add("open"); }
+function closeAuthModal(){ authOverlay.classList.remove("open"); }
+document.getElementById("authClose").addEventListener("click", closeAuthModal);
+authOverlay.addEventListener("click", (e)=>{ if(e.target === authOverlay) closeAuthModal(); });
+
+const tabLogin = document.getElementById("tabLogin");
+const tabSignup = document.getElementById("tabSignup");
+const loginForm = document.getElementById("loginForm");
+const signupForm = document.getElementById("signupForm");
+tabLogin.addEventListener("click", ()=>{
+  tabLogin.classList.add("active"); tabSignup.classList.remove("active");
+  loginForm.style.display = "block"; signupForm.style.display = "none";
+});
+tabSignup.addEventListener("click", ()=>{
+  tabSignup.classList.add("active"); tabLogin.classList.remove("active");
+  signupForm.style.display = "block"; loginForm.style.display = "none";
+});
+
+document.getElementById("loginBtn").addEventListener("click", async ()=>{
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+  if(!email || !password){ authStatus.textContent = "Renseignez votre email et mot de passe."; return; }
+  authStatus.textContent = "Connexion...";
+  const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  if(error){ authStatus.textContent = "Erreur : " + error.message; return; }
+  authStatus.textContent = "Connecté !";
+  closeAuthModal();
+});
+
+document.getElementById("signupBtn").addEventListener("click", async ()=>{
+  const full_name = document.getElementById("signupName").value.trim();
+  const phone = document.getElementById("signupPhone").value.trim();
+  const email = document.getElementById("signupEmail").value.trim();
+  const password = document.getElementById("signupPassword").value;
+  if(!email || !password || password.length < 6){ authStatus.textContent = "Email et mot de passe (6 caractères min.) requis."; return; }
+  authStatus.textContent = "Création du compte...";
+  const { data, error } = await supabaseClient.auth.signUp({ email, password });
+  if(error){ authStatus.textContent = "Erreur : " + error.message; return; }
+
+  // Complète le profil (nom, téléphone) — fonctionne seulement une fois connecté.
+  if(data.session){
+    await supabaseClient.from("profiles").update({ full_name, phone }).eq("id", data.user.id);
+    authStatus.textContent = "Compte créé !";
+    closeAuthModal();
+  } else {
+    authStatus.textContent = "Compte créé ! Vérifiez votre email pour confirmer, puis connectez-vous.";
+  }
+});
+
+async function renderAuthArea(session){
+  if(!session){
+    navAuth.innerHTML = `<button class="nav__login-btn" id="authLoginAction">Connexion</button>`;
+    document.getElementById("authLoginAction").addEventListener("click", openAuthModal);
+    return;
+  }
+  const { data } = await supabaseClient.from("wallets").select("balance").eq("user_id", session.user.id).single();
+  const balance = data ? data.balance : 0;
+  navAuth.innerHTML = `
+    <span class="nav__balance"><span class="balance-label">Solde&nbsp;</span>${balance.toLocaleString("fr-FR")} FCFA</span>
+    <button class="nav__login-btn" id="rechargeAction">Recharger</button>
+    <button class="nav__logout-btn" id="logoutBtn">Déconnexion</button>
+  `;
+  document.getElementById("rechargeAction").addEventListener("click", ()=> openRechargeModal());
+  document.getElementById("logoutBtn").addEventListener("click", async ()=>{
+    await supabaseClient.auth.signOut();
+  });
+}
+
+supabaseClient.auth.onAuthStateChange((_event, session)=> renderAuthArea(session));
+supabaseClient.auth.getSession().then(({ data })=> renderAuthArea(data.session));
+
+/* ---------- Mobile nav ---------- */
+const burger = document.getElementById("burger");
+const navLinks = document.getElementById("navLinks");
+burger.addEventListener("click", ()=> navLinks.classList.toggle("open"));
+navLinks.querySelectorAll("a").forEach(a=> a.addEventListener("click", ()=> navLinks.classList.remove("open")));
+
+/* ---------- Nav scroll shadow ---------- */
+const navEl = document.getElementById("nav");
+window.addEventListener("scroll", ()=>{
+  navEl.classList.toggle("scrolled", window.scrollY > 20);
+});
+
+/* ---------- FAQ accordion ---------- */
+document.querySelectorAll(".faq-item").forEach(item=>{
+  const q = item.querySelector(".faq-q");
+  const a = item.querySelector(".faq-a");
+  q.addEventListener("click", ()=>{
+    const isOpen = item.classList.contains("open");
+    document.querySelectorAll(".faq-item.open").forEach(o=>{
+      o.classList.remove("open");
+      o.querySelector(".faq-a").style.maxHeight = null;
+    });
+    if(!isOpen){
+      item.classList.add("open");
+      a.style.maxHeight = a.scrollHeight + "px";
+    }
+  });
+});
+
+/* ---------- Reveal on scroll ---------- */
+const revealEls = document.querySelectorAll(".reveal");
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){ e.target.classList.add("visible"); io.unobserve(e.target); }
+  });
+},{threshold:0.15});
+revealEls.forEach(el=> io.observe(el));
+
+/* ---------- Order form (Web3Forms) ---------- */
+const form = document.getElementById("orderForm");
+form.addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const btn = form.querySelector("button[type=submit]");
+  const original = btn.textContent;
+  btn.textContent = "Envoi en cours...";
+  try{
+    const res = await fetch("https://api.web3forms.com/submit", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json", Accept:"application/json" },
+      body: JSON.stringify(Object.fromEntries(new FormData(form)))
+    });
+    const json = await res.json();
+    if(json.success){
+      btn.textContent = "Demande envoyée ✓";
+      form.reset();
+    } else {
+      btn.textContent = "Erreur — réessayez";
+    }
+  } catch(err){
+    btn.textContent = "Erreur — réessayez";
+  }
+  setTimeout(()=> btn.textContent = original, 3000);
+});
+</script>
+</body>
+</html>
